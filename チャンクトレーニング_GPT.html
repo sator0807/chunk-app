@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>チャンク学習アプリ v8</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#1d2939;--muted:#667085;--line:#e5e7eb;--blue:#2563eb;--blue2:#1d4ed8;--soft:#eff6ff;--green:#16a34a;--red:#dc2626}*{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;background:linear-gradient(#fff,#f6f8fb);color:var(--ink)}button{font-family:inherit;-webkit-appearance:none;appearance:none;touch-action:manipulation}.app{max-width:980px;margin:0 auto;padding-bottom:80px}.top{padding:24px 18px 12px}.brand{display:flex;gap:12px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;box-shadow:0 12px 24px rgba(37,99,235,.22)}h1{font-size:27px;margin:0}.sub{color:var(--muted);line-height:1.6;margin-top:4px}.metrics{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.metric{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-weight:900}.screen{display:none;padding:0 18px 18px}.screen.active{display:block}.card,.question{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:0 14px 34px rgba(15,23,42,.07);padding:20px;margin:14px 0}.title{font-size:19px;font-weight:900;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:10px}.btn{border:0;border-radius:17px;padding:14px 14px;min-height:52px;font-size:16px;font-weight:900}.primary{background:var(--blue);color:#fff}.soft{background:var(--soft);color:var(--blue2);border:1px solid #dbeafe}.white{background:#fff;color:#344054;border:1px solid var(--line)}.select.active{background:var(--blue);color:#fff}.small{font-size:14px;color:var(--muted);line-height:1.8}.head{display:flex;align-items:center;justify-content:space-between;gap:10px}.counter{font-size:20px;font-weight:900}.score{display:flex;gap:8px}.score span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-weight:900}.bar{height:10px;background:#e9eef6;border-radius:999px;overflow:hidden;margin:10px 0 16px}.bar div{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#60a5fa)}.label{font-size:13px;font-weight:900;color:#2563eb;letter-spacing:.08em}.chunk{font-size:33px;font-weight:950;line-height:1.2;margin:7px 0 10px;word-break:break-word}.chunk span{background:linear-gradient(transparent 62%,#bfdbfe 62%)}.tap{cursor:pointer}.sentence{font-size:18px;line-height:1.6;background:#f8fafc;border:1px solid #e2e8f0;border-radius:17px;padding:13px;margin:10px 0}.choices{display:grid;gap:11px;margin-top:15px}.choice{background:#fff;border:1.5px solid var(--line);border-radius:17px;padding:16px;text-align:left;font-size:17px;font-weight:850;color:#111827}.choice.correct{border-color:#86efac;background:#ecfdf3;color:#027a48}.choice.wrong{border-color:#fca5a5;background:#fef2f2;color:#b42318}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.actions .btn{flex:1}.detail h2{font-size:30px;margin:0 0 6px;word-break:break-word}.meaning{font-size:22px;color:#1e40af;font-weight:900}.exbox{background:#f8fafc;border:1px solid #e2e8f0;border-radius:19px;padding:15px;margin:13px 0}.en{font-size:18px;line-height:1.7;font-weight:850;white-space:pre-line}.ja{font-size:15px;color:var(--muted);line-height:1.7;margin-top:8px;white-space:pre-line}.explain{font-size:16px;line-height:1.85}.result{text-align:center}.big{font-size:50px;font-weight:950;color:#2563eb}.bottom{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);border-top:1px solid var(--line);display:flex;justify-content:center;gap:8px;padding:9px env(safe-area-inset-right) calc(9px + env(safe-area-inset-bottom)) env(safe-area-inset-left);backdrop-filter:blur(12px)}.nav{background:transparent;border:0;border-radius:14px;padding:9px 14px;color:#475467;font-weight:900}.nav.active{background:var(--soft);color:#1e40af}.search{width:100%;border:1px solid var(--line);border-radius:17px;padding:13px;font-size:16px}.listitem{padding:14px 0;border-bottom:1px solid var(--line)}.tag{display:inline-block;background:#f2f4f7;color:#344054;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:800;margin-right:5px;margin-top:5px}.meta{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}.meta .tag{background:#eef4ff;color:#1d4ed8;border:1px solid #dbeafe}@media(max-width:640px){.app{padding-bottom:92px}.top{padding:18px 14px 10px}.screen{padding:0 12px 15px}.card,.question{border-radius:20px;padding:16px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:23px}.sub{font-size:14px}.chunk{font-size:26px}.sentence,.choice{font-size:16px}.actions{display:grid;grid-template-columns:1fr}.detail h2{font-size:25px}.bottom{border-radius:18px 18px 0 0}.nav{font-size:12px;padding:8px 12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><div class="logo">C</div><div><h1>チャンク学習アプリ</h1><div class="sub">B1からB2へ伸ばすための四択・音声・例文・解説つき英語チャンク帳</div></div></div><div class="metrics"><div class="metric" id="total">0 chunks</div><div class="metric" id="learned">学習済 0</div><div class="metric" id="accuracy">正答率 0%</div></div></header>
+<main>
+<section id="home" class="screen active"><div class="card"><div class="title">1. ジャンルを選ぶ</div><div class="grid" id="genreGrid"></div></div><div class="card"><div class="title">2. CEFRレベルを選ぶ</div><div class="grid" id="levelGrid"></div></div><div class="card"><div class="title">3. 学習を始める</div><p class="small">チャンク自体と、そのチャンクを使った自然な英文が表示されます。英文をタップすると音声が流れます。</p><div class="actions"><button class="btn primary" data-action="start">10問スタート</button><button class="btn soft" data-action="list">チャンク帳を見る</button></div></div></section>
+<section id="quiz" class="screen"><div class="head"><div class="counter" id="qCounter">第1問 / 10問</div><div class="score"><span>○ <b id="ok">0</b></span><span>× <b id="ng">0</b></span></div></div><div class="bar"><div id="prog"></div></div><div class="question"><div class="meta" id="qMeta"></div><div class="label">CHUNK</div><div class="chunk tap" id="qChunk" data-action="speakChunk"></div><div class="label">EXAMPLE SENTENCE - TAP TO LISTEN</div><div class="sentence tap" id="qSentence" data-action="speakSentence"></div><div class="small">🔊 チャンクまたは英文をタップすると音声再生できます</div><div class="choices" id="choices"></div><div class="actions"><button class="btn white" data-action="speakSentence">英文を聞く</button><button class="btn soft" data-action="detail">解説を見る</button><button class="btn primary" data-action="skipNext">次の問題へ</button></div></div></section>
+<section id="detail" class="screen"><div class="card detail"><div class="label">ANSWER & EXPLANATION</div><div class="meta" id="dMeta"></div><h2 id="dQuestion"></h2><div class="ja" id="dSentenceJa" style="font-size:18px;color:#475467"></div><div class="label">CHUNK MEANING</div><div class="meaning" id="dMeaning"></div><div class="small" id="dPattern" style="font-weight:900;margin-top:6px"></div><div class="exbox tap" data-action="speakConv"><div class="label">会話例</div><div class="en" id="dConv"></div><div class="ja" id="dConvJa"></div></div><div class="exbox tap" data-action="speakLong"><div class="label">例文</div><div class="en" id="dLong"></div><div class="ja" id="dLongJa"></div></div><p class="explain" id="dExplain"></p><div class="actions"><button class="btn primary" data-action="next">次の問題へ</button><button class="btn soft" data-action="speakDetail">解説を音声で聞く</button><button class="btn white" data-action="backQuiz">問題に戻る</button></div></div></section>
+<section id="result" class="screen"><div class="card result"><div class="title">10問終了</div><div class="big" id="resultScore">0/10</div><p class="small" id="resultMsg"></p><div class="actions"><button class="btn primary" data-action="again">同じ条件でさらに10問</button><button class="btn white" data-action="home">問題選択に戻る</button><button class="btn soft" data-action="list">チャンク帳を見る</button></div></div></section>
+<section id="list" class="screen"><div class="card"><input class="search" id="search" placeholder="チャンク・意味・ジャンルで検索"><div id="chunkList"></div></div></section>
+</main>
+<nav class="bottom"><button class="nav active" data-action="home">ホーム</button><button class="nav" data-action="quizNav">問題</button><button class="nav" data-action="list">チャンク帳</button></nav>
+</div>
+<script>
+(function(){
+var genres=['すべて','日常会話','感情・反応','観光','ビジネス','会議・議論','学習・説明'];
+var levels=['すべて','A2','B1','B1+','B2'];
+var selectedGenre='すべて',selectedLevel='すべて',chunks=[],quiz=[],idx=0,ok=0,ng=0,answered=false,current=null,detailItem=null;
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function randSort(a){return a.sort(function(){return Math.random()-.5})}
+function sample(a,n){return randSort(a.slice()).slice(0,Math.min(n,a.length))}
+function genreFor(t){if(/restaurant|Kyoto|local food|trip|reservation/.test(t))return '観光';if(/meeting|point|opinion/.test(t))return '会議・議論';if(/report|data|customers|cost|issue/.test(t))return 'ビジネス';if(/English|chunks|explain|practice/.test(t))return '学習・説明';if(/worried|glad|sorry|hope|feel/.test(t))return '感情・反応';return '日常会話'}
+function chooseBank(genre){
+ var banks={
+  '観光':{place:'travel',who:'the traveler',thing:'the reservation',next:'Can you show me the route?',jp:'旅行'},
+  'ビジネス':{place:'work',who:'the manager',thing:'the report',next:'Let’s confirm the deadline.',jp:'仕事'},
+  '会議・議論':{place:'the meeting',who:'the team',thing:'the proposal',next:'Let’s hear one more opinion.',jp:'会議'},
+  '学習・説明':{place:'English study',who:'the student',thing:'the example',next:'Could you give me another example?',jp:'学習'},
+  '感情・反応':{place:'a casual conversation',who:'my friend',thing:'the news',next:'Do you want to talk about it?',jp:'気持ちを伝える場面'},
+  '日常会話':{place:'daily life',who:'my friend',thing:'the plan',next:'What do you want to do next?',jp:'日常会話'}
+ };
+ return banks[genre]||banks['日常会話'];
+}
+function conversationFor(pattern,question,ja,genre){
+ var b=chooseBank(genre), p=pattern;
+ if(/makes sense|I see|I get it|Good point|agree|disagree|point of view|other hand|What I mean|In other words/.test(p))return ['A: '+question+'\nB: I see. Let’s use that idea in our next step.','A: '+ja+'\nB: なるほど。次のステップでその考えを使いましょう。'];
+ if(/feel like|tired|busy|glad|sorry|worried|hope|excited|looking forward/.test(p))return ['A: '+question+'\nB: I understand. Take your time, and we can talk later.','A: '+ja+'\nB: 分かりました。無理せず、あとで話しましょう。'];
+ if(/Could you|I’d like|looking for|How long|reservation|station|restaurant|Kyoto|local food/.test(question+p))return ['A: '+question+'\nB: Sure. It is about ten minutes from here.','A: '+ja+'\nB: もちろんです。ここから約10分です。'];
+ if(/Let me|I’ll|need to|have to|prioritize|take a closer look|schedule|report|data|customers|cost|issue/.test(question+p))return ['A: '+question+'\nB: Thanks. Please share it with us when you are ready.','A: '+ja+'\nB: ありがとうございます。準備できたら共有してください。'];
+ if(/What do you|What happened|What are you|What.+mean|What.+problem|plan|reason|difference/.test(p))return ['A: '+question+'\nB: I think we should look at the details first.','A: '+ja+'\nB: まず詳細を見るべきだと思います。'];
+ if(/looks like|sounds like|seems|turns out|ended up|reminds|about to/.test(p))return ['A: '+question+'\nB: Really? That changes how we should think about it.','A: '+ja+'\nB: 本当ですか。それなら考え方を変える必要がありますね。'];
+ return ['A: '+question+'\nB: That sounds good. Let’s talk about it a little more.','A: '+ja+'\nB: 良さそうですね。もう少し話しましょう。'];
+}
+function longFor(pattern,question,ja,genre){
+ var p=pattern, q=question, j=ja;
+ if(/feel like/.test(p))return [q+' Maybe I will make some coffee first and then start slowly.', j+' 先にコーヒーを入れて、それからゆっくり始めるかもしれません。'];
+ if(/thinking about/.test(p))return [q+' I have not decided yet, so I want to compare a few options this week.', j+' まだ決めていないので、今週いくつかの選択肢を比べたいです。'];
+ if(/ended up/.test(p))return [q+' I had another plan at first, but this choice felt better in the end.', j+' 最初は別の予定がありましたが、最終的にはこの選択の方が良いと感じました。'];
+ if(/used to/.test(p))return [q+' It felt difficult at first, but now it is part of my routine.', j+' 最初は難しく感じましたが、今では習慣の一部です。'];
+ if(/looking forward/.test(p))return [q+' I have been preparing little by little, and I am excited about it.', j+' 少しずつ準備してきたので、それを楽しみにしています。'];
+ if(/worried about/.test(p))return [q+' I checked the schedule twice, but I still want to be careful.', j+' 予定を二回確認しましたが、それでも慎重に進めたいです。'];
+ if(/glad to hear|sorry to hear/.test(p))return [q+' Please tell me more when you have time.', j+' 時間がある時に、もう少し詳しく聞かせてください。'];
+ if(/I’d like/.test(p))return [q+' If possible, I would prefer a quiet seat near the window.', j+' 可能であれば、窓際の静かな席がいいです。'];
+ if(/Could you tell me/.test(p))return [q+' I am new here, so a simple explanation would really help.', j+' ここは初めてなので、簡単に説明してもらえると本当に助かります。'];
+ if(/looking for/.test(p))return [q+' I want somewhere quiet where I can sit and read for a while.', j+' しばらく座って本を読める静かな場所を探しています。'];
+ if(/How long/.test(p))return [q+' I need to be there before three, so I want to leave enough time.', j+' 3時前に着く必要があるので、十分な時間を見ておきたいです。'];
+ if(/looks like/.test(p))return [q+' Maybe we should take an umbrella before we leave.', j+' 出かける前に傘を持っていった方がよさそうです。'];
+ if(/sounds like/.test(p))return [q+' Let’s try it and see if it works for our schedule.', j+' 試してみて、私たちの予定に合うか確認しましょう。'];
+ if(/seems like/.test(p))return [q+' We should wait a little longer before making a final decision.', j+' 最終決定をする前に、もう少し待った方がよさそうです。'];
+ if(/reminds me/.test(p))return [q+' I have not thought about that memory for a long time.', j+' その思い出については長い間考えていませんでした。'];
+ if(/What do you think/.test(p))return [q+' I want to hear your honest opinion before we decide.', j+' 決める前に、あなたの率直な意見を聞きたいです。'];
+ if(/What do you mean/.test(p))return [q+' I understand the words, but I am not sure about your main point.', j+' 言葉は分かりますが、主な意図が少し分かりません。'];
+ if(/What I mean is/.test(p))return [q+' I am not saying the idea is bad; I just think we need more time.', j+' その考えが悪いと言っているのではなく、もう少し時間が必要だと思っています。'];
+ if(/That works/.test(p))return [q+' I can adjust my schedule and meet you then.', j+' 予定を調整して、その時間に会えます。'];
+ if(/That makes sense/.test(p))return [q+' Now I understand why you chose that option.', j+' なぜその選択肢を選んだのか、今は理解できます。'];
+ if(/I see what you mean/.test(p))return [q+' I had a different idea at first, but your explanation is clear.', j+' 最初は違う考えでしたが、あなたの説明は分かりやすいです。'];
+ if(/I get it/.test(p))return [q+' I was confused at first, but now the process is clear.', j+' 最初は混乱しましたが、今は手順がはっきりしました。'];
+ if(/Good point/.test(p))return [q+' We should add that to the list before we forget it.', j+' 忘れる前に、それをリストに加えた方がいいです。'];
+ if(/depends/.test(p))return [q+' If it rains, I will stay home; if it is sunny, I will go out.', j+' 雨なら家にいて、晴れなら出かけます。'];
+ if(/agree/.test(p))return [q+' That plan is realistic, and I think the team can follow it.', j+' その計画は現実的で、チームも実行できると思います。'];
+ if(/disagree/.test(p))return [q+' I understand the reason, but I think there is a better option.', j+' 理由は分かりますが、もっと良い選択肢があると思います。'];
+ if(/almost done/.test(p))return [q+' I just need to check the last part before I send it.', j+' 送る前に、最後の部分を確認するだけです。'];
+ if(/on my way/.test(p))return [q+' I left the station five minutes ago, so I should arrive soon.', j+' 5分前に駅を出たので、もうすぐ着くはずです。'];
+ if(/get back to you/.test(p))return [q+' I need to confirm one detail first, and then I will reply.', j+' 先に一点確認してから返信します。'];
+ if(/Let me check/.test(p))return [q+' I do not want to give you the wrong information.', j+' 間違った情報を伝えたくありません。'];
+ if(/Let me explain/.test(p))return [q+' There are two reasons why I think this plan is useful.', j+' この計画が役に立つと思う理由は二つあります。'];
+ if(/trying to/.test(p))return [q+' I practice a little every day, even when I am busy.', j+' 忙しい時でも、毎日少しずつ練習しています。'];
+ if(/decided to/.test(p))return [q+' I was nervous at first, but I think it was the right choice.', j+' 最初は不安でしたが、正しい選択だったと思います。'];
+ if(/takes time/.test(p))return [q+' I do not need to rush, but I need to keep practicing.', j+' 急ぐ必要はありませんが、練習を続ける必要があります。'];
+ if(/The thing is/.test(p))return [q+' I want to help, but I already have another appointment.', j+' 手伝いたいのですが、すでに別の予定があります。'];
+ if(/The problem is/.test(p))return [q+' We have a good idea, but we do not have enough people.', j+' 良いアイデアはありますが、人手が足りません。'];
+ if(/The point is/.test(p))return [q+' We should focus on the customer, not only on the product.', j+' 商品だけでなく、顧客に集中すべきです。'];
+ if(/The reason is/.test(p))return [q+' The first plan looked good, but the cost was too high.', j+' 最初の計画は良さそうでしたが、費用が高すぎました。'];
+ if(/As far as/.test(p))return [q+' The meeting is still scheduled for Friday afternoon.', j+' 私の知る限り、会議はまだ金曜午後の予定です。'];
+ if(/From my point of view/.test(p))return [q+' This option is safer, even if it takes a little more time.', j+' 少し時間がかかっても、この選択肢の方が安全です。'];
+ if(/On the other hand/.test(p))return [q+' The cheaper plan saves money, but the quality may be lower.', j+' 安い計画は費用を節約できますが、品質は下がるかもしれません。'];
+ if(/Compared with/.test(p))return [q+' This app is easier to use, but the other one has more features.', j+' このアプリは使いやすいですが、もう一方は機能が多いです。'];
+ if(/prioritize/.test(p))return [q+' Customers are waiting, so this task should come first.', j+' 顧客が待っているので、この作業を先にすべきです。'];
+ if(/take a closer look/.test(p))return [q+' The total number looks fine, but the details may tell a different story.', j+' 合計数は問題なさそうですが、詳細を見ると違うことが分かるかもしれません。'];
+ if(/That leads to/.test(p))return [q+' A small delay now could create a bigger problem next week.', j+' 今の小さな遅れが、来週もっと大きな問題を生むかもしれません。'];
+ if(/To be honest/.test(p))return [q+' I expected the task to be easier than it actually was.', j+' 正直に言うと、その作業は実際より簡単だと思っていました。'];
+ if(/By the way/.test(p))return [q+' Did you receive the message I sent this morning?', j+' ところで、今朝送ったメッセージは受け取りましたか。'];
+ if(/In other words/.test(p))return [q+' We should spend less time planning and more time testing.', j+' つまり、計画にかける時間を減らし、テストにもっと時間を使うべきです。'];
+ return [q+' I want to use it naturally in my next conversation.', j+' 次の会話で自然に使ってみたいです。'];
+}
+function explainFor(pattern,meaning,genre,level){
+ var use='';
+ if(/feel like/.test(pattern))use='「I feel like ～ing」は、強い予定ではなく「今は～したい気分」と柔らかく言う表現です。英作文では feel like の後ろを動名詞にして、食事・休憩・学習などを自然に足します。';
+ else if(/thinking about/.test(pattern))use='「I’m thinking about ～ing」は、まだ決定前の考えを伝える表現です。英作文では about の後ろに名詞か動名詞を置くと、検討中・迷い中のニュアンスを自然に出せます。';
+ else if(/Let me/.test(pattern))use='「Let me ～」は、相手に許可を求めながら自分が行動する時の丁寧な出だしです。確認・説明・試行などの動詞を入れると、ビジネスでも会話でも使いやすいです。';
+ else if(/looks like|sounds like|seems/.test(pattern))use='「～のようだ」と判断や印象を述べる表現です。見た情報なら looks like、聞いた情報なら sounds like、全体的な印象なら seems を使うと自然です。';
+ else if(/What/.test(pattern))use='疑問をそのままぶつけるのではなく、会話を広げるための質問チャンクです。英作文では What の後ろを固定して覚え、最後の名詞だけ替えると質問がすぐ作れます。';
+ else if(/The .* is|The thing is|The problem is|The point is|The reason is/.test(pattern))use='「The ～ is」は、話の要点・問題・理由を整理して伝える型です。英作文では is の後ろに短い文を置くと、会議や説明で論理的に話しやすくなります。';
+ else if(/As far as|From my point|On the other hand|Compared with/.test(pattern))use='B2に向けて重要な、意見や比較を整理する表現です。英作文では文頭に置き、その後に主張を続けると、単なる短文よりも論理的な発話になります。';
+ else if(/I’ll|I need to|I have to|I decided to|I’m going to/.test(pattern))use='予定・必要性・決定を短く伝えるチャンクです。英作文では後ろに動詞の原形を置くだけで、仕事・学習・旅行の行動予定をすぐ作れます。';
+ else use='短い反応や説明を自然に出すための基本チャンクです。英作文では全文を作ろうとせず、この型を先に置いてから、人・物・時間・場所だけを入れ替えると口から出やすくなります。';
+ return '【場面】'+genre+'で、相手に反応したり、自分の考えを短く伝えたりする時に使います。CEFR '+level+'では、正確さよりも「すぐ言える型」として定着させるのが効果的です。\n【活用】'+use;
+}
+function makeItem(id,pattern,meaning,genre,level,question,ja){
+ var cv=conversationFor(pattern,question,ja,genre);
+ var lg=longFor(pattern,question,ja,genre);
+ var explain=explainFor(pattern,meaning,genre,level);
+ return {id:id,pattern:pattern,chunk:pattern,meaning:meaning,genre:genre,level:level,question:question,sentenceJa:ja,conv:cv[0],convJa:cv[1],long:lg[0],longJa:lg[1],explain:explain};
+}
+function buildData(){
+ var base=[
+ ['That makes sense.','なるほど、納得です','日常会話','A2','That makes sense to me.','私には納得できます。'],['I see what you mean.','言いたいことは分かります','日常会話','A2','I see what you mean about the problem.','その問題について言いたいことは分かります。'],['I get it.','分かりました','日常会話','A2','Oh, I get it now.','ああ、今分かりました。'],['I didn’t know that.','それは知りませんでした','日常会話','A2','I didn’t know that before.','それは前は知りませんでした。'],['Good point.','良い指摘です','会議・議論','B1','That is a good point.','それは良い指摘です。'],['It depends on 〜.','〜によります','日常会話','B1','It depends on the situation.','状況によります。'],['I’m not sure about 〜.','〜についてはよく分かりません','日常会話','B1','I’m not sure about that idea.','その考えについてはよく分かりません。'],['I agree with 〜.','〜に賛成です','会議・議論','B1','I agree with your opinion.','あなたの意見に賛成です。'],['I disagree with 〜.','〜に反対です','会議・議論','B1','I disagree with that plan.','その計画には反対です。'],['I’m a little busy.','少し忙しいです','日常会話','A2','I’m a little busy right now.','今少し忙しいです。'],['I’m kind of tired.','少し疲れています','感情・反応','A2','I’m kind of tired after work.','仕事のあと少し疲れています。'],['I’m almost done with 〜.','〜はほぼ終わりです','ビジネス','B1','I’m almost done with the report.','レポートはほぼ終わりです。'],['I’m on my way.','向かっています','日常会話','A2','I’m on my way now.','今向かっています。'],['I’ll get back to you.','あとで連絡します','ビジネス','B1','I’ll get back to you tomorrow.','明日ご連絡します。'],['Let me check 〜.','〜を確認させてください','ビジネス','B1','Let me check the schedule first.','まず予定を確認させてください。'],['Let me explain 〜.','〜を説明させてください','学習・説明','B1','Let me explain the situation.','状況を説明させてください。'],['It looks like 〜.','〜のように見えます','日常会話','B1','It looks like rain today.','今日は雨が降りそうです。'],['It sounds like 〜.','〜のように聞こえます','日常会話','B1','It sounds like a good idea.','良いアイデアのように聞こえます。'],['I feel like 〜ing.','〜したい気分です','感情・反応','B1','I feel like reviewing the report.','レポートを見直したい気分です。'],['I’m thinking about 〜ing.','〜することを考えています','日常会話','B1','I’m thinking about changing jobs.','転職することを考えています。'],['I’m trying to 〜.','〜しようとしています','学習・説明','B1','I’m trying to improve my English.','英語を上達させようとしています。'],['I decided to 〜.','〜することに決めました','日常会話','B1','I decided to start studying today.','今日から勉強を始めることに決めました。'],['What do you think about 〜?','〜についてどう思いますか','会議・議論','B1','What do you think about this plan?','この計画についてどう思いますか。'],['What do you mean by 〜?','〜とはどういう意味ですか','学習・説明','B1','What do you mean by that comment?','そのコメントはどういう意味ですか。'],['That works for me.','それで大丈夫です','ビジネス','B1','Tomorrow works for me.','明日で大丈夫です。'],['I’m glad to hear that.','それを聞いて嬉しいです','感情・反応','A2','I’m glad to hear that news.','その知らせを聞いて嬉しいです。'],['I’m sorry to hear that.','それは残念です','感情・反応','A2','I’m sorry to hear that.','それは残念です。'],['It takes time.','時間がかかります','学習・説明','A2','Learning English takes time.','英語習得には時間がかかります。'],['It reminds me of 〜.','〜を思い出します','日常会話','B1+','It reminds me of my childhood.','子どもの頃を思い出します。'],['The thing is 〜.','実は〜です','日常会話','B1+','The thing is I don’t have time today.','実は今日は時間がありません。'],['The problem is 〜.','問題は〜です','会議・議論','B1+','The problem is we don’t have enough time.','問題は十分な時間がないことです。'],['The point is 〜.','要点は〜です','会議・議論','B1+','The point is we need a clear plan.','要点は明確な計画が必要だということです。'],['It turns out 〜.','結局〜だと分かりました','日常会話','B1+','It turns out he was right.','結局、彼が正しかったと分かりました。'],['I was about to 〜.','ちょうど〜するところでした','日常会話','B1+','I was about to leave the office.','ちょうど会社を出るところでした。'],['What I mean is 〜.','私が言いたいのは〜です','会議・議論','B1+','What I mean is we need more practice.','私が言いたいのは、もっと練習が必要だということです。'],['That’s why 〜.','だから〜です','学習・説明','B1','That’s why I started studying English.','だから英語の勉強を始めました。'],['To be honest, 〜.','正直に言うと〜です','日常会話','B1','To be honest, I’m tired today.','正直に言うと、今日は疲れています。'],['By the way, 〜.','ところで〜です','日常会話','B1','By the way, how was your trip?','ところで、旅行はどうでしたか。'],['In other words, 〜.','つまり〜です','学習・説明','B1+','In other words, we need more time.','つまり、もっと時間が必要です。'],['Could you say that again?','もう一度言っていただけますか','日常会話','A2','Could you say that again slowly?','もう一度ゆっくり言っていただけますか。'],['I’d like to 〜.','〜したいです','観光','A2','I’d like to make a reservation.','予約をしたいです。'],['Could you tell me where 〜 is?','〜がどこか教えていただけますか','観光','A2','Could you tell me where the station is?','駅がどこか教えていただけますか。'],['I’m looking for 〜.','〜を探しています','観光','A2','I’m looking for a nice café.','良いカフェを探しています。'],['How long does it take to 〜?','〜するのにどのくらいかかりますか','観光','B1','How long does it take to get there?','そこに着くのにどのくらいかかりますか。'],['From my point of view, 〜.','私の観点では〜です','会議・議論','B2','From my point of view, this is important.','私の観点では、これは重要です。'],['As far as I know, 〜.','私の知る限り〜です','ビジネス','B2','As far as I know, the information is correct.','私の知る限り、その情報は正しいです。'],['We need to prioritize 〜.','〜を優先する必要があります','ビジネス','B2','We need to prioritize this issue.','この課題を優先する必要があります。'],['Let’s take a closer look at 〜.','〜をもう少し詳しく見ましょう','ビジネス','B1+','Let’s take a closer look at the data.','データをもう少し詳しく見ましょう。'],['That leads to 〜.','それは〜につながります','会議・議論','B2','That leads to another problem.','それは別の問題につながります。'],['On the other hand, 〜.','一方で〜です','会議・議論','B2','On the other hand, we need more practice.','一方で、もっと練習が必要です。']
+ ];
+ var arr=[],id=1,i; for(i=0;i<base.length;i++){arr.push(makeItem(id++,base[i][0],base[i][1],base[i][2],base[i][3],base[i][4],base[i][5]));}
+ var verbs=[['reviewing the report','レポートを見直す'],['checking the schedule','予定を確認する'],['practicing English','英語を練習する'],['visiting Kyoto','京都を訪れる'],['taking a short break','少し休憩する'],['trying a new restaurant','新しいレストランを試す'],['joining the meeting','会議に参加する'],['talking with customers','顧客と話す'],['learning new chunks','新しいチャンクを学ぶ'],['preparing for tomorrow','明日の準備をする']];
+ var nouns=[['the schedule','予定'],['the report','レポート'],['the data','データ'],['the plan','計画'],['the problem','問題'],['the restaurant','レストラン'],['local food','地元の食べ物'],['the meeting','会議'],['the result','結果'],['the next step','次のステップ']];
+ var adjs=[['important','重要'],['difficult','難しい'],['useful','役に立つ'],['interesting','面白い'],['possible','可能'],['expensive','高い'],['reasonable','妥当'],['clear','明確'],['natural','自然'],['necessary','必要']];
+ function add(p,m,q,ja,l){arr.push(makeItem(id++,p,m,genreFor(q),l||'B1',q,ja));}
+ for(i=0;i<verbs.length;i++){var ing=verbs[i][0],jv=verbs[i][1];add('I feel like 〜ing.','〜したい気分です','I feel like '+ing+' today.','今日は'+jv+'気分です。','B1');add('I’m thinking about 〜ing.','〜することを考えています','I’m thinking about '+ing+' this weekend.','今週末、'+jv+'ことを考えています。','B1');add('I ended up 〜ing.','結局〜しました','I ended up '+ing+' after work.','仕事のあと、結局'+jv+'ことになりました。','B1+');add('I’m used to 〜ing.','〜することに慣れています','I’m used to '+ing+' every day.','毎日'+jv+'ことに慣れています。','B1+');add('I’m looking forward to 〜ing.','〜することを楽しみにしています','I’m looking forward to '+ing+' next week.','来週'+jv+'ことを楽しみにしています。','B1+');}
+ for(i=0;i<nouns.length;i++){var n=nouns[i][0],jn=nouns[i][1];add('Let me check 〜.','〜を確認させてください','Let me check '+n+' first.','まず'+jn+'を確認させてください。','B1');add('I’m interested in 〜.','〜に興味があります','I’m interested in '+n+'.',jn+'に興味があります。','B1');add('I’m worried about 〜.','〜が心配です','I’m worried about '+n+'.',jn+'が心配です。','B1');add('Could you explain 〜?','〜を説明していただけますか','Could you explain '+n+' again?',jn+'をもう一度説明していただけますか。','B1');add('Let’s take a closer look at 〜.','〜をもう少し詳しく見ましょう','Let’s take a closer look at '+n+'.',jn+'をもう少し詳しく見ましょう。','B1+');}
+ for(i=0;i<adjs.length;i++){var a=adjs[i][0],j=adjs[i][1];add('It seems 〜.','〜のようです','It seems '+a+' to me.','私には'+j+'なように思えます。','B1');add('It sounds 〜.','〜に聞こえます','It sounds '+a+'.',j+'に聞こえます。','B1');add('From my point of view, 〜.','私の観点では〜です','From my point of view, this is '+a+'.','私の観点では、これは'+j+'です。','B2');}
+ var more=[['As far as I can tell, 〜.','私が分かる限り〜です','As far as I can tell, the plan is working.','私が分かる限り、その計画はうまくいっています。','B2'],['Compared with before, 〜.','以前と比べて〜です','Compared with before, my listening is better.','以前と比べて、リスニングが良くなっています。','B2'],['What happened was 〜.','何が起きたかというと〜です','What happened was I missed the train.','何が起きたかというと、電車に乗り遅れました。','B1+'],['That reminds me of 〜.','〜を思い出します','That reminds me of my first trip abroad.','それは初めての海外旅行を思い出させます。','B1+'],['The next step is to 〜.','次のステップは〜することです','The next step is to test the idea.','次のステップはそのアイデアを試すことです。','B1+'],['I’d rather 〜.','むしろ〜したいです','I’d rather talk about it tomorrow.','むしろ明日それについて話したいです。','B2'],['I’m supposed to 〜.','〜することになっています','I’m supposed to send the file today.','今日そのファイルを送ることになっています。','B1+'],['I’m likely to 〜.','〜しそうです','I’m likely to be late today.','今日は遅れそうです。','B2']];
+ for(var r=0;r<45;r++){for(i=0;i<more.length;i++){add(more[i][0],more[i][1],more[i][2],more[i][3],more[i][4]);}}
+ return arr.slice(0,650);
+}
+function renderButtons(){var g='',l='',i;for(i=0;i<genres.length;i++){g+='<button class="btn soft select" data-action="genre" data-value="'+genres[i]+'">'+genres[i]+'</button>'}for(i=0;i<levels.length;i++){l+='<button class="btn soft select" data-action="level" data-value="'+levels[i]+'">'+levels[i]+'</button>'}$('genreGrid').innerHTML=g;$('levelGrid').innerHTML=l;markSelects();}
+function markSelects(){var bs=document.querySelectorAll('.select');for(var i=0;i<bs.length;i++){var b=bs[i],v=b.getAttribute('data-value');if(v===selectedGenre||v===selectedLevel)b.classList.add('active');else b.classList.remove('active');}}
+function pool(){var a=[];for(var i=0;i<chunks.length;i++){var x=chunks[i];if((selectedGenre==='すべて'||x.genre===selectedGenre)&&(selectedLevel==='すべて'||x.level===selectedLevel))a.push(x)}return a;}
+function startQuiz(){var p=pool();if(p.length<4){alert('この条件の問題が少ないため、条件を広げてください。');return}quiz=sample(p,10);idx=0;ok=0;ng=0;showQuestion();}
+function showQuestion(){answered=false;current=quiz[idx];show('quiz');$('qCounter').innerHTML='第'+(idx+1)+'問 / '+quiz.length+'問';$('qMeta').innerHTML='<span class="tag">'+esc(current.genre)+'</span><span class="tag">CEFR '+esc(current.level)+'</span>';$('ok').innerHTML=ok;$('ng').innerHTML=ng;$('qChunk').innerHTML='<span>'+esc(current.pattern)+'</span>';$('qSentence').innerHTML=esc(current.question);$('prog').style.width=(idx/quiz.length*100)+'%';var wrong=[],i;for(i=0;i<chunks.length;i++){if(chunks[i].meaning!==current.meaning)wrong.push(chunks[i].meaning)}var opts=sample([current.meaning].concat(sample(wrong,3)),4);var html='';for(i=0;i<opts.length;i++){html+='<button class="choice" data-action="answer" data-value="'+esc(opts[i])+'">'+esc(opts[i])+'</button>'}$('choices').innerHTML=html;}
+function answer(btn,val){if(answered)return;answered=true;var correct=val===current.meaning;if(correct){ok++;btn.classList.add('correct')}else{ng++;btn.classList.add('wrong');var cs=document.querySelectorAll('.choice');for(var i=0;i<cs.length;i++){if(cs[i].textContent===current.meaning)cs[i].classList.add('correct')}}save(correct);$('ok').innerHTML=ok;$('ng').innerHTML=ng;setTimeout(function(){showDetail(current)},450);}
+function showDetail(item){detailItem=item;show('detail');$('dMeta').innerHTML='<span class="tag">'+esc(item.genre)+'</span><span class="tag">CEFR '+esc(item.level)+'</span>';$('dQuestion').innerHTML=esc(item.question);$('dSentenceJa').innerHTML=esc(item.sentenceJa);$('dMeaning').innerHTML=esc(item.meaning);$('dPattern').innerHTML='チャンク：'+esc(item.pattern);$('dConv').innerHTML=esc(item.conv);$('dConvJa').innerHTML=esc(item.convJa);$('dLong').innerHTML=esc(item.long);$('dLongJa').innerHTML=esc(item.longJa);$('dExplain').innerHTML=esc(item.explain);}
+function nextQuestion(){if(idx>=quiz.length-1)showResult();else{idx++;showQuestion();}}
+function showResult(){$('prog').style.width='100%';show('result');$('resultScore').innerHTML=ok+'/'+quiz.length;$('resultMsg').innerHTML=selectedGenre+'・'+selectedLevel+' の条件で10問完了しました。間違えたチャンクは、解説例文を3回音読すると定着しやすくなります。';}
+function speak(t){try{if(!('speechSynthesis' in window)){alert('この端末では音声読み上げに対応していません。');return}window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(String(t).replace(/A:|B:/g,''));u.lang='en-US';u.rate=.88;u.pitch=1;u.volume=1;window.speechSynthesis.speak(u)}catch(e){alert('音声再生を開始できませんでした。もう一度タップしてください。')}}
+function speakDetail(){if(detailItem)speak(detailItem.pattern+'. '+detailItem.question+'. '+detailItem.conv+'. '+detailItem.long)}
+function show(id){var ss=document.querySelectorAll('.screen'),i;for(i=0;i<ss.length;i++)ss[i].classList.remove('active');$(id).classList.add('active');var ns=document.querySelectorAll('.nav');for(i=0;i<ns.length;i++)ns[i].classList.remove('active');if(id==='home')ns[0].classList.add('active');else if(id==='list')ns[2].classList.add('active');else ns[1].classList.add('active');}
+function renderList(){var q=($('search').value||'').toLowerCase(),html='',count=0;for(var i=0;i<chunks.length&&count<180;i++){var x=chunks[i],hay=(x.pattern+x.question+x.meaning+x.genre+x.level).toLowerCase();if(hay.indexOf(q)>-1){html+='<div class="listitem tap" data-action="item" data-id="'+x.id+'"><b>'+esc(x.pattern)+'</b><br><span>'+esc(x.question)+'</span><br><span>'+esc(x.meaning)+'</span><br><span class="tag">'+x.genre+'</span><span class="tag">'+x.level+'</span></div>';count++;}}$('chunkList').innerHTML=html;}
+function getStats(){try{return JSON.parse(localStorage.getItem('chunkStats5')||'{"done":0,"ok":0}')}catch(e){return {done:0,ok:0}}}
+function setStats(s){try{localStorage.setItem('chunkStats5',JSON.stringify(s))}catch(e){}}
+function save(correct){var s=getStats();s.done++;if(correct)s.ok++;setStats(s);updateStats();}
+function updateStats(){var s=getStats();$('learned').innerHTML='学習済 '+s.done;$('accuracy').innerHTML='正答率 '+(s.done?Math.min(100,Math.round(s.ok/s.done*100)):0)+'%';}
+function findById(id){for(var i=0;i<chunks.length;i++){if(String(chunks[i].id)===String(id))return chunks[i]}return null;}
+function handle(e){var el=e.target;while(el&&el!==document&&!el.getAttribute('data-action'))el=el.parentNode;if(!el||el===document)return;var a=el.getAttribute('data-action');
+ if(a==='genre'){selectedGenre=el.getAttribute('data-value');markSelects();return}
+ if(a==='level'){selectedLevel=el.getAttribute('data-value');markSelects();return}
+ if(a==='start'||a==='again'){startQuiz();return}
+ if(a==='home'){show('home');return}
+ if(a==='list'){show('list');renderList();return}
+ if(a==='quizNav'){if(current)show('quiz');else startQuiz();return}
+ if(a==='speakChunk'){if(current)speak(current.pattern);return}
+ if(a==='speakSentence'){if(current)speak(current.question);return}
+ if(a==='detail'){if(current)showDetail(current);return}
+ if(a==='answer'){answer(el,el.getAttribute('data-value'));return}
+ if(a==='next'){nextQuestion();return}
+ if(a==='skipNext'){nextQuestion();return}
+ if(a==='backQuiz'){show('quiz');return}
+ if(a==='speakConv'){if(detailItem)speak(detailItem.conv);return}
+ if(a==='speakLong'){if(detailItem)speak(detailItem.long);return}
+ if(a==='speakDetail'){speakDetail();return}
+ if(a==='item'){var it=findById(el.getAttribute('data-id'));if(it)showDetail(it);return}
+}
+function init(){chunks=buildData();$('total').innerHTML=chunks.length+' chunks';renderButtons();updateStats();document.body.addEventListener('click',handle,false);$('search').addEventListener('input',renderList,false);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,false);else init();
+})();
+</script>
+</body>
+</html>
